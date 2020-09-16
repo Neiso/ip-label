@@ -2,6 +2,7 @@
 const MongoClient = require("mongodb").MongoClient;
 const connectionString =
   "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false";
+
 //PARSING LOGIC
 const bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
@@ -11,13 +12,18 @@ const express = require("express");
 const app = express();
 const port = 3000;
 
+//MIDDLEWARE COOKIE
 app.use(cookieParser());
 
-//AJOUTER LE 404 NOT FOUND
-//AJOUTER LA DOC
-//VERIFIER LE COOKIE AVANT TOUTES LES ROUTES AVEC UN MIDDLEWARE
-
-app.get("/", async (req, res) => {
+/*
+    ========================================================================================
+      Middleware a l'entrée des routes pour vérifier que le client possède bien un cookie.
+      - S'il n'en possède pas, on lui envoie un cookie 
+        (l'ID de session ne se trouve pas dans la DB ou pas d'ID de session).
+      - S'il en possède un, un continuer pour atteindre l'URL demandée.
+    ========================================================================================
+*/
+app.use(async (req, res, next) => {
   const client = MongoClient(connectionString, {
     useUnifiedTopology: true,
   });
@@ -30,7 +36,6 @@ app.get("/", async (req, res) => {
     const document = await db.findOne({
       session_id: cookie,
     });
-    console.log(document, req.cookies);
     if (!document) {
       const session_id = Math.floor(Math.random() * 10000000);
       await db.insertOne({
@@ -39,10 +44,9 @@ app.get("/", async (req, res) => {
         list: [],
       });
       res.cookie("session_id", session_id);
-      res.send("Registered!");
-      // await client.close();
+      res.json({ msg: "You can start to play with your number list :)" });
     } else {
-      res.send(document);
+      next();
     }
   } catch (err) {
     console.error("Error is  : ", err);
@@ -50,11 +54,26 @@ app.get("/", async (req, res) => {
       error: true,
       errorMsg: "An error occured please try again later.",
     });
-  } finally {
-    // await client.close();
   }
 });
 
+/*
+    ========================================================================================
+      Le / redirect vers l'url print.
+    ========================================================================================
+
+*/
+app.get("/", async (req, res) => {
+  res.redirect("http://localhost:3000/print");
+});
+
+/*
+    ========================================================================================
+      Fonction pour récupérer une session avec une ID de session
+      directement dans les paramètres de l'url. On va simplement envoyer un cookie
+      avec cette ID.
+    ========================================================================================
+*/
 app.get("/recover", async (req, res) => {
   const client = MongoClient(connectionString, {
     useUnifiedTopology: true,
@@ -80,6 +99,13 @@ app.get("/recover", async (req, res) => {
   }
 });
 
+/*
+    ========================================================================================
+      On récupère la liste de nombre dans la DB grace a l'ID de session qui est envoyé
+      à l'aide d'un cookie (session_id), et on la renvoie.
+    ========================================================================================
+*/
+
 app.get("/print", async (req, res) => {
   const client = MongoClient(connectionString, {
     useUnifiedTopology: true,
@@ -104,6 +130,14 @@ app.get("/print", async (req, res) => {
     });
   }
 });
+
+/*
+    ========================================================================================
+      On récupère la liste de nombre dans la DB grace a l'ID de session qui est envoyé
+      à l'aide d'un cookie (session_id), et on utilise l'operateur $push pour directement
+      ajouter la valeur dans la liste à l'aide d'une update.
+    ========================================================================================
+*/
 
 app.get("/addValue", async (req, res) => {
   const value = parseInt(req.query["value"]);
@@ -143,6 +177,12 @@ app.get("/addValue", async (req, res) => {
   }
 });
 
+/*
+    ========================================================================================
+      On update la liste de nombre directement à vide [] a l'aide de l'operateur $set.
+    ========================================================================================
+*/
+
 app.get("/removeAll", async (req, res) => {
   const client = MongoClient(connectionString, {
     useUnifiedTopology: true,
@@ -172,6 +212,14 @@ app.get("/removeAll", async (req, res) => {
     });
   }
 });
+
+/*
+    ========================================================================================
+      On récupère la liste de nombre, on trouve l'index correspondant a la valeur demandée
+      qui se trouve en paramètre de l'URL (value), on supprimer l'élément et on update
+      la liste dans la DB. 
+    ========================================================================================
+*/
 
 app.get("/removeOne", async (req, res) => {
   const value = parseInt(req.query["value"]);
@@ -215,6 +263,13 @@ app.get("/removeOne", async (req, res) => {
   }
 });
 
+/*
+    ========================================================================================
+      On récupère la liste de nombre, on calcule la moyenne de celle-ci et on renvoie
+      le résulat.
+    ========================================================================================
+*/
+
 app.get("/mean", async (req, res) => {
   const client = MongoClient(connectionString, {
     useUnifiedTopology: true,
@@ -247,6 +302,13 @@ app.get("/mean", async (req, res) => {
     });
   }
 });
+
+/*
+    ========================================================================================
+      On récupère la liste de nombre, on calcule la moyenne de celle-ci et on renvoie
+      le résulat.
+    ========================================================================================
+*/
 
 app.get("/medianMean", async (req, res) => {
   const client = MongoClient(connectionString, {
@@ -284,6 +346,14 @@ app.get("/medianMean", async (req, res) => {
     });
   }
 });
+
+/*
+    ========================================================================================
+      On va utiliser un paramètre d'url (:type), pour savoir quelle opération le client
+      souhaite effectuer, on récupère la liste de nombre dans la DB, on applique 
+      l'opération et on update la liste. On renvoie également le résultat.
+    ========================================================================================
+*/
 
 app.get("/operation/:type", async (req, res) => {
   const client = MongoClient(connectionString, {
@@ -344,6 +414,12 @@ app.get("/operation/:type", async (req, res) => {
   }
 });
 
+// 404 NOT FOUND HANDLER
+
+app.get("*", function (req, res) {
+  res.status(404).json({ error: true, errorMsg: "404 Not found." });
+});
+
 app.listen(port, () => {
-  console.log(`Example app listening at http:///localhost:${port}`);
+  console.log(`Example app listening at http://localhost:${port}`);
 });
