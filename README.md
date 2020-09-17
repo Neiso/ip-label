@@ -4,8 +4,7 @@
 
 ### Utilisation :
 
-- Rendez-vous sur http://djulianouatla.com (le nom de domaine est récent, il se peut qu'il ne soit pas dans le cache de votre navigateur favori).
-- Rentrez le titre dans un film (minimum 3 caractères).
+- Rendez-vous sur http://www.djulianouatla.com
 - Naviguez à travers tous les résultats.
 
 ## API
