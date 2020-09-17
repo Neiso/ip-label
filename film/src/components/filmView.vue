@@ -26,7 +26,6 @@
 }
 
 #img {
-  width: 60%;
   margin: auto;
 }
 </style>
