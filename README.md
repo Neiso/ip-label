@@ -5,6 +5,7 @@
 ### Utilisation :
 
 - Rendez-vous sur http://www.djulianouatla.com
+- Lancez votre recherche. (! minimum 3 caractères)
 - Naviguez à travers tous les résultats.
 
 ## API
