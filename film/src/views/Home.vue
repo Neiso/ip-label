@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <div class="Home">
-      <v-col cols="12" sm="6" md="3">
+      <v-col cols="12" sm="6">
         <div id="searchBar">
           <v-text-field
             id="searchField"

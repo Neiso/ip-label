@@ -4,13 +4,14 @@
       @click="openDetails()"
       :src="movieDetail.Poster"
       lazy-src="../assets/movie-poster-coming-soon.png"
+      id="img"
     ></v-img>
     <router-link
       :to="{ name: 'filmViewDetails', query: {id:movieDetail.imdbID}}"
       target="_blank"
     >More information.</router-link>
-    <h1>Title : {{movieDetail.Title}}</h1>
-    <h1>Year : {{movieDetail.Year}}</h1>
+    <h3>Title : {{movieDetail.Title}}</h3>
+    <h3>Year : {{movieDetail.Year}}</h3>
   </div>
 </template>
 
@@ -22,6 +23,11 @@
 
 .filmContainer h1 {
   margin-top: 10px;
+}
+
+#img {
+  width: 60%;
+  margin: auto;
 }
 </style>
 
