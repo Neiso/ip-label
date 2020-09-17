@@ -1,8 +1,8 @@
-### ip-label
+# ip-label
 
 ## Outil de recherche de film.
 
-# Utilisation :
+### Utilisation :
 
 - Rendez-vous sur http://djulianouatla.com (le nom de domaine est récent, il se peut qu'il ne soit pas dans le cache de votre navigateur favori).
 - Rentrez le titre dans un film (minimum 3 caractères).
@@ -10,7 +10,7 @@
 
 ## API
 
-# Utilisation :
+### Utilisation :
 
 Les requêtes doivent être adressées a l'adresse http://api.djulianouatla.com
 Si vous n'avez pas de session active, elle sera générée automatiquement lors de votre premier appel api.
